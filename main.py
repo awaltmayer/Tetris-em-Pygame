@@ -36,6 +36,7 @@ def main():
                         rodando = False
 
                 elif jogo.estado_jogo == "fim_de_jogo":
+
                     if "Reiniciar" in jogo.botoes_fim_de_jogo_rects and jogo.botoes_fim_de_jogo_rects["Reiniciar"].collidepoint(mouse_pos):
                         jogo.reiniciar_jogo()
                     elif "Menu Principal" in jogo.botoes_fim_de_jogo_rects and jogo.botoes_fim_de_jogo_rects["Menu Principal"].collidepoint(mouse_pos):
@@ -73,7 +74,7 @@ def main():
                         jogo.move_direita_pressionado = False
                     elif evento.key == pygame.K_DOWN:
                         jogo.queda_suave_pressionado = False
-    
+
         jogo.atualizar()
         jogo.desenhar()
 

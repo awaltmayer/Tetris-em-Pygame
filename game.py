@@ -17,11 +17,13 @@ class Tetris:
             self.font_principal = pygame.font.Font("recursos/font.ttf", 36)
             self.font_secundaria = pygame.font.Font("recursos/font.ttf", 28)
             self.font_placar = pygame.font.Font("recursos/font.ttf", 22)
+            self.font_placar_grande = pygame.font.Font("recursos/font.ttf", 48)
         except FileNotFoundError:
             self.font_principal = pygame.font.Font(None, 42)
             self.font_secundaria = pygame.font.Font(None, 34)
             self.font_placar = pygame.font.Font(None, 28)
-        
+            self.font_placar_grande = pygame.font.Font(None, 54)
+
         try:
             self.font_pixel = pygame.font.Font("recursos/pixel_font.ttf", 72)
         except FileNotFoundError:
@@ -32,6 +34,7 @@ class Tetris:
         self.img_borda_dir = self.carregar_imagem("borda_direita.png", (config.TAMANHO_BLOCO, config.ALTURA_TELA))
         self.imagem_fundo_menu = self.carregar_imagem("TetrizosFundo.png", (config.LARGURA_TELA, config.ALTURA_TELA))
         self.imagem_pause = self.carregar_imagem("layout_pause.png", (400, 300))
+        self.imagem_fundo_game_over = self.carregar_imagem("fundoGame.png", (config.LARGURA_TELA, config.ALTURA_TELA))
         
         self.em_animacao_limpeza_linha = False; self.tempo_inicio_animacao = 0; self.linhas_a_limpar = []
         self.peca_atual = None; self.proximas_pecas = []; self.peca_segurada = None; self.pode_segurar = True
@@ -348,65 +351,76 @@ class Tetris:
         self.nickname_box.draw(self.tela)
 
     def desenhar_tela_fim_de_jogo(self):
-        self.tela.fill(config.COR_FUNDO)
-        
-        if self.img_borda_esq:
-            self.tela.blit(self.img_borda_esq, (0, 0))
-        if self.img_borda_dir:
-            self.tela.blit(self.img_borda_dir, (config.LARGURA_TELA - config.TAMANHO_BLOCO, 0))
-        
-        game_surf = self.font_pixel.render("GAME", True, config.COR_TITULO_GAME)
-        over_surf = self.font_pixel.render("OVER", True, config.COR_TITULO_OVER)
-        game_rect = game_surf.get_rect(center=(config.LARGURA_TELA / 2, 80))
-        over_rect = over_surf.get_rect(center=(config.LARGURA_TELA / 2, 160))
-        self.tela.blit(game_surf, game_rect); self.tela.blit(over_surf, over_rect)
-        
-        stats_rect = pygame.Rect(0, 0, 450, 140)
-        stats_rect.center = (config.LARGURA_TELA / 2, 280)
-        self.desenhar_painel_customizado(self.tela, stats_rect, config.COR_PAINEL_BORDA_NEON, "SUA PONTUAÇÃO")
-        
-        stats = {"Jogador": self.nickname, "Pontos": self.score, "Tempo": time.strftime("%M:%S", time.gmtime(self.duracao_jogo))}
-        y_offset = stats_rect.y + 55
-        for chave, valor in stats.items():
-            texto_chave = self.font_placar.render(f"{chave}:", True, config.CINZA)
-            self.tela.blit(texto_chave, (stats_rect.x + 30, y_offset))
-            texto_valor = self.font_secundaria.render(str(valor), True, config.BRANCO)
-            self.tela.blit(texto_valor, texto_valor.get_rect(right=stats_rect.right - 30, centery=texto_chave.get_rect(centery=y_offset).centery))
-            y_offset += 35
-            
-        ranking_rect = pygame.Rect(0, 0, 450, 220)
-        ranking_rect.center = (config.LARGURA_TELA / 2, 475)
-        self.desenhar_painel_customizado(self.tela, ranking_rect, config.COR_PAINEL_BORDA_NEON, "RANKING GERAL")
-        
+
+        if self.imagem_fundo_game_over:
+            self.tela.blit(self.imagem_fundo_game_over, (0, 0))
+        else:
+            self.tela.fill(config.COR_FUNDO)
+
+        nome_rect = config.RECT_GAMEOVER_NOME
+        texto_nome_surf = self.font_placar_grande.render(self.nickname.upper(), True, config.BRANCO)
+        padding_icone = nome_rect.height
+        area_texto_nome = pygame.Rect(
+            nome_rect.x + padding_icone, nome_rect.y,
+            nome_rect.width - padding_icone, nome_rect.height
+        )
+        texto_nome_rect = texto_nome_surf.get_rect(center=area_texto_nome.center)
+        self.tela.blit(texto_nome_surf, texto_nome_rect)
+
+        ranking_rect = config.RECT_GAMEOVER_RANKING
         scores = database.carregar_ultimos_scores_db(5)
-        y_inicial_ranking = ranking_rect.y + 60
-        y_offset_ranking = 30
-        for i, (score_id, nick, pont) in enumerate(scores):
-            y_atual = y_inicial_ranking + (i * y_offset_ranking)
-            is_player_score = (score_id == self.id_ultimo_score)
-            cor_pos = config.OURO if i == 0 else config.PRATA if i == 1 else config.BRONZE if i == 2 else config.CINZA
-            pos_surf = self.font_placar.render(f"{i + 1}º", True, cor_pos)
-            self.tela.blit(pos_surf, (ranking_rect.x + 30, y_atual))
-            nick_surf = self.font_placar.render(nick, True, config.BRANCO)
-            self.tela.blit(nick_surf, (ranking_rect.x + 90, y_atual))
-            pont_surf = self.font_placar.render(f"{pont} pts", True, config.BRANCO)
-            self.tela.blit(pont_surf, pont_surf.get_rect(right=ranking_rect.right - 30, centery=pos_surf.get_rect(centery=y_atual).centery))
-            if is_player_score:
-                underline_rect = pygame.Rect(ranking_rect.x + 20, y_atual + 25, ranking_rect.w - 40, 2)
-                pygame.draw.rect(self.tela, config.COR_DESTAQUE_JOGADOR, underline_rect)
-                
+        col_pos_x = ranking_rect.left + 40
+        col_nick_x = ranking_rect.left + 100
+        col_tempo_x = ranking_rect.right - 150
+        col_pontos_x = ranking_rect.right - 50
+        
+        altura_linha = ranking_rect.height / 5.2
+        y_inicial = ranking_rect.y + (altura_linha / 2)
+
+        for i, (score_id, nick, pont, duracao) in enumerate(scores):
+            y_centro_linha = y_inicial + (i * altura_linha)
+            
+            tempo_str = time.strftime('%M:%S', time.gmtime(duracao))
+
+            cor_pos = config.OURO if i == 0 else config.PRATA if i == 1 else config.BRONZE if i == 2 else config.BRANCO
+            
+            pos_surf = self.font_secundaria.render(f"{i + 1}º", True, cor_pos)
+            nick_surf = self.font_secundaria.render(nick, True, config.BRANCO)
+            tempo_surf = self.font_secundaria.render(tempo_str, True, config.BRANCO)
+            pont_surf = self.font_secundaria.render(str(pont), True, config.BRANCO)
+
+            self.tela.blit(pos_surf, pos_surf.get_rect(centerx=col_pos_x, centery=y_centro_linha))
+            self.tela.blit(nick_surf, nick_surf.get_rect(left=col_nick_x, centery=y_centro_linha))
+            self.tela.blit(tempo_surf, tempo_surf.get_rect(centerx=col_tempo_x, centery=y_centro_linha))
+            self.tela.blit(pont_surf, pont_surf.get_rect(right=col_pontos_x, centery=y_centro_linha))
+
+        stats_rect = config.RECT_GAMEOVER_STATS
+        
+        titulo_surf = self.font_secundaria.render("Minha Pontuação", True, config.BRANCO)
+        self.tela.blit(titulo_surf, titulo_surf.get_rect(centerx=stats_rect.centerx, top=stats_rect.top + 20))
+        
+        pontos_jogador_surf = self.font_placar_grande.render(str(self.score), True, config.BRANCO)
+        self.tela.blit(pontos_jogador_surf, pontos_jogador_surf.get_rect(center=(stats_rect.centerx, stats_rect.centery - 10)))
+        
+        tempo_jogador_str = time.strftime('%M:%S', time.gmtime(self.duracao_jogo))
+        tempo_jogador_surf = self.font_secundaria.render(tempo_jogador_str, True, config.BRANCO)
+        self.tela.blit(tempo_jogador_surf, tempo_jogador_surf.get_rect(centerx=stats_rect.centerx, bottom=stats_rect.bottom - 40))
+
         mouse_pos = pygame.mouse.get_pos()
-        y_botoes = ranking_rect.bottom + 20
         self.botoes_fim_de_jogo_rects.clear()
-        for nome_botao in self.nomes_botoes_fim_de_jogo:
-            rect_botao = pygame.Rect(0, 0, 300, 50)
-            rect_botao.center = (config.LARGURA_TELA / 2, y_botoes)
+        botoes_config = {
+            "Reiniciar": config.RECT_GAMEOVER_BOTAO_REINICIAR,
+            "Menu Principal": config.RECT_GAMEOVER_BOTAO_MENU
+        }
+
+        for nome_botao, rect_botao in botoes_config.items():
             self.botoes_fim_de_jogo_rects[nome_botao] = rect_botao
-            cor_borda = config.COR_BOTAO_NEON_HOVER if rect_botao.collidepoint(mouse_pos) else config.COR_PAINEL_BORDA_NEON
-            self.desenhar_painel_customizado(self.tela, rect_botao, cor_borda)
+            cor_botao = config.COR_BOTAO_MENU_HOVER if rect_botao.collidepoint(mouse_pos) else config.COR_BOTAO_MENU
+            pygame.draw.rect(self.tela, cor_botao, rect_botao, border_radius=8)
+            pygame.draw.rect(self.tela, config.BRANCO, rect_botao, 2, border_radius=8)
+            
             texto = self.font_secundaria.render(nome_botao, True, config.BRANCO)
             self.tela.blit(texto, texto.get_rect(center=rect_botao.center))
-            y_botoes += 60
 
     def finalizar_jogo(self):
         if self.fim_de_jogo: return
@@ -415,3 +429,9 @@ class Tetris:
         self.id_ultimo_score = database.salvar_score_db(self.nickname, self.score, int(self.duracao_jogo))
         self.estado_jogo = "fim_de_jogo"
         self.tempo_inicio_fim_de_jogo = time.time()
+
+
+
+
+
+

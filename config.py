@@ -16,6 +16,7 @@ CANTO_SUPERIOR_X = (LARGURA_TELA - LARGURA_TOTAL_CONTEUDO) // 2
 CANTO_SUPERIOR_Y = (ALTURA_TELA - ALTURA_JOGO) // 2
 PAINEL_INFO_X = CANTO_SUPERIOR_X + LARGURA_JOGO + ESPACAMENTO_PAINEL
 
+
 PRETO = (0, 0, 0)
 BRANCO = (255, 255, 255)
 CINZA = (128, 128, 128)
@@ -72,7 +73,6 @@ TETROMINOS = {
     'S': {'cor': VERDE, 'forma': FORMA_S}, 'T': {'cor': ROXO, 'forma': FORMA_T},
     'Z': {'cor': VERMELHO, 'forma': FORMA_Z}
 }
-
 DESLOCAMENTOS_JLSTZ = {
     (0, 1): [(0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2)], (1, 0): [(0, 0), (1, 0), (1, 1), (0, -2), (1, -2)],
     (1, 2): [(0, 0), (1, 0), (1, 1), (0, -2), (1, -2)], (2, 1): [(0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2)],
@@ -85,3 +85,9 @@ DESLOCAMENTOS_I = {
     (2, 3): [(0, 0), (2, 0), (-1, 0), (2, -1), (-1, 2)], (3, 2): [(0, 0), (-2, 0), (1, 0), (-2, 1), (1, -2)],
     (3, 0): [(0, 0), (1, 0), (-2, 0), (1, 2), (-2, -1)], (0, 3): [(0, 0), (-1, 0), (2, 0), (-1, -2), (2, 1)],
 }
+
+RECT_GAMEOVER_NOME = pygame.Rect(290, 115, 480, 80)
+RECT_GAMEOVER_RANKING = pygame.Rect(140, 220, 520, 350)
+RECT_GAMEOVER_STATS = pygame.Rect(680, 220, 230, 210)
+RECT_GAMEOVER_BOTAO_REINICIAR = pygame.Rect(375, 595, 250, 55)
+RECT_GAMEOVER_BOTAO_MENU = pygame.Rect(375, 655, 250, 55)

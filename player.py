@@ -16,15 +16,15 @@ class Peca:
         self.y += dy
 
     def obter_coords_forma(self, rotacao=None):
+
         if rotacao is None:
             rotacao = self.rotacao
-        
-        rotacao_real = rotacao % len(self.forma) 
 
+        rotacao_real = rotacao % len(self.forma) 
+        
         forma_atual = self.forma[rotacao_real]
         
         coords_absolutas = []
         for dx, dy in forma_atual:
-
             coords_absolutas.append((self.x + dx, self.y + dy))
         return coords_absolutas
