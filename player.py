@@ -10,13 +10,11 @@ class Peca:
         self.cor = config.TETROMINOS[nome_forma]['cor']
         self.forma = config.TETROMINOS[nome_forma]['forma']
         self.rotacao = 0 
-
     def mover(self, dx, dy):
         self.x += dx
         self.y += dy
 
     def obter_coords_forma(self, rotacao=None):
-
         if rotacao is None:
             rotacao = self.rotacao
 

@@ -14,32 +14,33 @@ def main():
 
     jogo = Tetris(tela)
 
-    rodando = True
-    while rodando:
+    while jogo.rodando:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                rodando = False
+                jogo.rodando = False
 
             if jogo.estado_jogo == "menu":
                 retorno_input = jogo.nickname_box.handle_event(evento)
                 if retorno_input == "enter":
-                    if jogo.nickname_box.text.strip():
-                        jogo.reiniciar_jogo()
-
+                    jogo.ir_para_welcome()
+            
             if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
                 mouse_pos = evento.pos
                 if jogo.estado_jogo == "menu":
                     if jogo.botoes_menu_principal["iniciar"].collidepoint(mouse_pos):
-                        if jogo.nickname_box.text.strip():
-                            jogo.reiniciar_jogo()
+                        jogo.ir_para_welcome()
                     elif jogo.botoes_menu_principal["sair"].collidepoint(mouse_pos):
-                        rodando = False
+                        jogo.rodando = False
+                
+                elif jogo.estado_jogo == "welcome":
+                    if jogo.botao_iniciar_welcome.collidepoint(mouse_pos):
+                        jogo.reiniciar_jogo()
 
                 elif jogo.estado_jogo == "fim_de_jogo":
-
-                    if "Reiniciar" in jogo.botoes_fim_de_jogo_rects and jogo.botoes_fim_de_jogo_rects["Reiniciar"].collidepoint(mouse_pos):
+                    botoes_config = {"Reiniciar": config.RECT_GAMEOVER_BOTAO_REINICIAR, "Menu Principal": config.RECT_GAMEOVER_BOTAO_MENU}
+                    if botoes_config["Reiniciar"].collidepoint(mouse_pos):
                         jogo.reiniciar_jogo()
-                    elif "Menu Principal" in jogo.botoes_fim_de_jogo_rects and jogo.botoes_fim_de_jogo_rects["Menu Principal"].collidepoint(mouse_pos):
+                    elif botoes_config["Menu Principal"].collidepoint(mouse_pos):
                         jogo.estado_jogo = "menu"
 
             if evento.type == pygame.KEYDOWN:
@@ -74,7 +75,7 @@ def main():
                         jogo.move_direita_pressionado = False
                     elif evento.key == pygame.K_DOWN:
                         jogo.queda_suave_pressionado = False
-
+        
         jogo.atualizar()
         jogo.desenhar()
 

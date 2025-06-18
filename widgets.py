@@ -43,7 +43,6 @@ class TextInputBox:
             screen.blit(self.prompt_surface, (self.rect.x + 10, self.rect.y + 10))
         else:
             screen.blit(self.txt_surface, (self.rect.x + 10, self.rect.y + 10))
-
         if self.active:
             if (time.time() * 2) % 2 < 1:
                 cursor_x = self.rect.x + 10 + self.txt_surface.get_width()

@@ -38,7 +38,7 @@ def salvar_score_db(nickname, pontuacao, duracao_segundos):
 def carregar_ultimos_scores_db(limit=5):
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    c.execute("SELECT id, nickname, pontuacao, duracao_segundos FROM scores ORDER BY pontuacao DESC LIMIT ?", (limit,))
+    c.execute("SELECT id, nickname, pontuacao, duracao_segundos FROM scores ORDER BY id DESC LIMIT ?", (limit,))
     scores = c.fetchall()
     conn.close()
     return scores
