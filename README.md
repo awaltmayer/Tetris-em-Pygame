@@ -6,6 +6,13 @@
 
 ---
 
+- ## Teste
+- **Nome:** Ricardo Drews
+- **RA (Registro Acadêmico):** 1138132
+
+
+---
+
 ## Descrição do Jogo
 
 Bem-vindo ao **Tetrizos**! Neste jogo, você é um arquiteto digital com a missão de organizar fluxos de dados caóticos que caem do ciberespaço na forma de blocos coloridos, os "Tetrominós".
